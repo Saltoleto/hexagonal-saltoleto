@@ -1,16 +1,15 @@
 package com.empresa.produto.domain.port.in;
 
+import com.empresa.produto.domain.model.Pagina;
 import com.empresa.produto.domain.model.Produto;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.empresa.produto.domain.model.ResultadoPaginado;
 
 import java.math.BigDecimal;
 
 /**
  * Port de entrada — contrato do caso de uso de listagem de produtos.
  *
- * Define O QUÊ a aplicação faz, sem revelar COMO faz.
- * O Filtro como record interno mantém o contrato coeso e evita proliferação de classes.
+ * Zero dependência de framework. Pagina e ResultadoPaginado são tipos do próprio domínio.
  */
 public interface ListarProdutosUseCase {
 
@@ -22,5 +21,5 @@ public interface ListarProdutosUseCase {
             Boolean ativo
     ) {}
 
-    Page<Produto> executar(Filtro filtro, Pageable pageable);
+    ResultadoPaginado<Produto> executar(Filtro filtro, Pagina pagina);
 }

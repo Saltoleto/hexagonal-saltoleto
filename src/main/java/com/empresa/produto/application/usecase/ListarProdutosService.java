@@ -1,23 +1,21 @@
 package com.empresa.produto.application.usecase;
 
+import com.empresa.produto.domain.model.Pagina;
 import com.empresa.produto.domain.model.Produto;
+import com.empresa.produto.domain.model.ResultadoPaginado;
 import com.empresa.produto.domain.port.in.ListarProdutosUseCase;
 import com.empresa.produto.domain.port.out.ProdutoRepositoryPort;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Implementação do caso de uso de listagem de produtos.
  *
- * Responsabilidades:
- * - Orquestrar a chamada ao repositório via port de saída.
- * - Gerenciar a transação (readOnly = true para leitura — evita dirty checking).
- * - Aplicar regras de orquestração se houver (ex: enriquecer resultado, combinar fontes).
+ * Depende apenas de tipos do domínio — Pagina e ResultadoPaginado.
+ * Zero importação de Spring Data nesta camada.
  *
- * @Service é legítimo aqui: esta classe pertence à camada application,
- * não ao domínio. O uso de anotações Spring nesta camada é aceito e pragmático.
+ * @Service e @Transactional são as únicas anotações Spring permitidas aqui:
+ * gerenciam ciclo de vida e transação, não lógica de negócio.
  */
 @Service
 @Transactional(readOnly = true)
@@ -30,7 +28,7 @@ class ListarProdutosService implements ListarProdutosUseCase {
     }
 
     @Override
-    public Page<Produto> executar(Filtro filtro, Pageable pageable) {
-        return produtoRepository.listar(filtro, pageable);
+    public ResultadoPaginado<Produto> executar(Filtro filtro, Pagina pagina) {
+        return produtoRepository.listar(filtro, pagina);
     }
 }
