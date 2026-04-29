@@ -101,6 +101,19 @@ O coração da aplicação. Contém apenas Java puro — sem Spring, sem JPA, se
 
 ---
 
+### `application/usecase/` — nota sobre `Pageable`
+
+O use case utiliza `Pageable` e `Page` do Spring Data. Isso representa um acoplamento técnico consciente e documentado.
+
+**Por que não abstrair:**
+- `Pageable` é uma interface estável — não muda entre versões do Spring.
+- Criar tipos próprios (`Pagina`, `ResultadoPaginado`) tem custo real de manutenção sem ganho prático se o projeto não vai trocar de framework.
+- O acoplamento fica contido na camada `application` — o `domain/model` permanece puro.
+
+**Quando abstrair faz sentido:** bibliotecas reutilizáveis, SDKs, projetos que precisam rodar com múltiplos frameworks, ou equipes com política explícita de zero dependência de framework no application layer.
+
+---
+
 ### `domain/port/in/`
 
 Interfaces que definem **o que a aplicação sabe fazer**. São os casos de uso expostos para o mundo externo.
@@ -384,6 +397,7 @@ O Flyway executará as migrations automaticamente na primeira inicialização.
 | `open-in-view: false`                | Transação não pode vazar para a camada de serialização        |
 | `ddl-auto: validate`                 | Schema é responsabilidade do Flyway, não do JPA               |
 | `@Service` no use case               | Pragmático e correto — use case não é domínio                 |
+| `Pageable` do Spring no use case      | Trade-off consciente: `Pageable` é interface estável, custo de abstrair supera o benefício em projetos Spring puros |
 | `ProdutoEntity` package-private      | Infraestrutura não pode vazar para fora do adapter            |
 | `ProdutoJpaRepository` package-private | Ninguém acessa o repositório JPA diretamente                |
 | Virtual Threads habilitado           | Throughput de I/O sem complexidade de WebFlux reativo         |
