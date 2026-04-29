@@ -7,7 +7,6 @@ import java.math.BigDecimal;
  * Entidade JPA — representação da tabela `produtos` no banco de dados.
  *
  * Confinada à camada de infraestrutura. Nunca exposta para fora do adapter de persistência.
- * Separada do modelo de domínio para que mudanças no schema não afetem o domínio e vice-versa.
  */
 @Entity
 @Table(name = "produtos")
@@ -35,7 +34,9 @@ class ProdutoEntity {
     @Column(nullable = false)
     private boolean ativo;
 
-    // Construtor padrão exigido pelo JPA
+    @Column(name = "usuario_id")
+    private Long usuarioId;
+
     ProdutoEntity() {}
 
     Long getId()               { return id; }
@@ -45,6 +46,7 @@ class ProdutoEntity {
     Integer getEstoque()       { return estoque; }
     String getCategoria()      { return categoria; }
     boolean isAtivo()          { return ativo; }
+    Long getUsuarioId()        { return usuarioId; }
 
     void setId(Long id)                   { this.id = id; }
     void setNome(String nome)             { this.nome = nome; }
@@ -53,4 +55,5 @@ class ProdutoEntity {
     void setEstoque(Integer estoque)      { this.estoque = estoque; }
     void setCategoria(String categoria)   { this.categoria = categoria; }
     void setAtivo(boolean ativo)          { this.ativo = ativo; }
+    void setUsuarioId(Long usuarioId)     { this.usuarioId = usuarioId; }
 }

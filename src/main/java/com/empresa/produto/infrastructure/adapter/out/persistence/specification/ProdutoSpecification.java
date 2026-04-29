@@ -11,14 +11,9 @@ import java.math.BigDecimal;
  *
  * Cada filtro é um método privado independente que retorna null quando inativo.
  * O Spring Data ignora specs nulas em Specification.where().and() — sem predicate
- * desnecessário na query (sem o "1=1" que cb.conjunction() geraria).
+ * desnecessário na query.
  *
- * Benefícios sobre o padrão de lista de Predicates com ifs:
- * - Cada predicado tem nome, é legível e reutilizável em outras Specifications.
- * - comFiltro() é uma declaração de intenção, não um bloco de código.
- * - Adicionar um novo filtro = adicionar um método + uma linha no comFiltro().
- *
- * Classe utilitária — construtor privado, acesso apenas via métodos estáticos.
+ * Adicionar um novo filtro = adicionar um método privado + uma linha no comFiltro().
  */
 public final class ProdutoSpecification {
 
@@ -26,11 +21,25 @@ public final class ProdutoSpecification {
 
     public static Specification<ProdutoEntity> comFiltro(Filtro filtro) {
         return Specification
-                .where(comNome(filtro.nome()))
+                .where(comProdutoId(filtro.produtoId()))
+                .and(comUsuarioId(filtro.usuarioId()))
+                .and(comNome(filtro.nome()))
                 .and(comCategoria(filtro.categoria()))
                 .and(comPrecoMinimo(filtro.precoMin()))
                 .and(comPrecoMaximo(filtro.precoMax()))
                 .and(comAtivo(filtro.ativo()));
+    }
+
+    private static Specification<ProdutoEntity> comProdutoId(Long produtoId) {
+        return (root, query, cb) ->
+                produtoId == null ? null
+                : cb.equal(root.get("id"), produtoId);
+    }
+
+    private static Specification<ProdutoEntity> comUsuarioId(Long usuarioId) {
+        return (root, query, cb) ->
+                usuarioId == null ? null
+                : cb.equal(root.get("usuarioId"), usuarioId);
     }
 
     private static Specification<ProdutoEntity> comNome(String nome) {

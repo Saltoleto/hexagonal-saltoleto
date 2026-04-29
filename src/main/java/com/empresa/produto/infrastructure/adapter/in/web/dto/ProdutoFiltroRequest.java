@@ -1,14 +1,18 @@
 package com.empresa.produto.infrastructure.adapter.in.web.dto;
 
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 
 /**
- * DTO de entrada — representa os parâmetros de filtro recebidos via query string.
+ * DTO de entrada — parâmetros de filtro recebidos via query string.
  *
- * Todos os campos são opcionais. Validação feita aqui — nunca no domínio.
- * Mapeado via @ModelAttribute no controller.
+ * produtoId e usuarioId NÃO estão aqui — chegam por outros mecanismos HTTP
+ * (@PathVariable e @RequestParam direto no controller) e são combinados
+ * com este record no momento da construção do Filtro.
+ *
+ * Todos os campos são opcionais.
  */
 public record ProdutoFiltroRequest(
 

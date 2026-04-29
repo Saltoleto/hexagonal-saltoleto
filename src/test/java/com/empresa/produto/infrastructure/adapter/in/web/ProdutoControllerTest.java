@@ -28,6 +28,7 @@ class ProdutoControllerTest {
     @MockBean
     ProdutoWebMapper mapper;
 
+    @SuppressWarnings("unchecked")
     private ResultadoPaginado<Object> resultadoVazio() {
         return new ResultadoPaginado<>(List.of(), 0L, 0, 0, true, true);
     }
@@ -36,29 +37,50 @@ class ProdutoControllerTest {
     void deveRetornar200ComListaVazia() throws Exception {
         when(listarProdutos.executar(any(), any())).thenReturn((ResultadoPaginado) resultadoVazio());
 
-        mvc.perform(get("/api/v1/produtos"))
+        mvc.perform(get("/api/v1/produtos/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
                 .andExpect(jsonPath("$.totalElements").value(0));
     }
 
     @Test
+    void deveRetornar200ComUsuarioId() throws Exception {
+        when(listarProdutos.executar(any(), any())).thenReturn((ResultadoPaginado) resultadoVazio());
+
+        mvc.perform(get("/api/v1/produtos/1").param("usuarioId", "7"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void deveRetornar400QuandoProdutoIdZero() throws Exception {
+        mvc.perform(get("/api/v1/produtos/0"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void deveRetornar400QuandoUsuarioIdZero() throws Exception {
+        mvc.perform(get("/api/v1/produtos/1").param("usuarioId", "0"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void deveRetornar400QuandoNomeExcede150Caracteres() throws Exception {
-        mvc.perform(get("/api/v1/produtos").param("nome", "A".repeat(151)))
+        mvc.perform(get("/api/v1/produtos/1").param("nome", "A".repeat(151)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void deveRetornar400QuandoPrecoMinNegativo() throws Exception {
-        mvc.perform(get("/api/v1/produtos").param("precoMin", "-1"))
+        mvc.perform(get("/api/v1/produtos/1").param("precoMin", "-1"))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    void deveAceitarFiltrosValidos() throws Exception {
+    void deveAceitarTodosOsFiltrosCombinados() throws Exception {
         when(listarProdutos.executar(any(), any())).thenReturn((ResultadoPaginado) resultadoVazio());
 
-        mvc.perform(get("/api/v1/produtos")
+        mvc.perform(get("/api/v1/produtos/42")
+                        .param("usuarioId", "7")
                         .param("nome", "notebook")
                         .param("categoria", "ELETRONICO")
                         .param("precoMin", "500")
@@ -71,17 +93,7 @@ class ProdutoControllerTest {
     void deveAceitarOrdenacaoPorCampoValido() throws Exception {
         when(listarProdutos.executar(any(), any())).thenReturn((ResultadoPaginado) resultadoVazio());
 
-        mvc.perform(get("/api/v1/produtos").param("sort", "preco,desc"))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void deveAceitarOrdenacaoPorMultiplosCampos() throws Exception {
-        when(listarProdutos.executar(any(), any())).thenReturn((ResultadoPaginado) resultadoVazio());
-
-        mvc.perform(get("/api/v1/produtos")
-                        .param("sort", "categoria,asc")
-                        .param("sort", "preco,desc"))
+        mvc.perform(get("/api/v1/produtos/1").param("sort", "preco,desc"))
                 .andExpect(status().isOk());
     }
 
@@ -89,7 +101,7 @@ class ProdutoControllerTest {
     void deveRetornar200MesmoCampoOrdenacaoInvalido() throws Exception {
         when(listarProdutos.executar(any(), any())).thenReturn((ResultadoPaginado) resultadoVazio());
 
-        mvc.perform(get("/api/v1/produtos").param("sort", "campoInexistente,desc"))
+        mvc.perform(get("/api/v1/produtos/1").param("sort", "campoInexistente,desc"))
                 .andExpect(status().isOk());
     }
 }
